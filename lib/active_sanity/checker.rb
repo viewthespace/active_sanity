@@ -9,8 +9,9 @@ module ActiveSanity
       puts "Checking the following models: #{models.join(', ')}"
 
       # TODO: Wouldnt this list already be checked by the next all records call if those records do exist?
-      # This will validate and destroy the records that either dont exist currently, or are now valid. But the ones are continue to be invalid - these will
-      # have been run through the validation process twice
+      # This will validate and destroy the records that either don't exist currently, or are now valid. But the ones are continue to be invalid - these will
+      # have been run through the validation process twice! Since the whole run will anyway process all records in all tables, we could just truncate this table
+      # before each run - wouldn't that be simpler?
       check_previously_invalid_records
       check_all_records
     end
