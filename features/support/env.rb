@@ -12,11 +12,11 @@ end
 
 After do
   # Reset DB!
-  User.delete_all if 
-  Category.delete_all
-  Post.delete_all
-  InvalidRecord.delete_all if InvalidRecord.table_exists?
-  %w(users categories posts invalid_records).each do |table|
-    ActiveRecord::Base.connection.execute("DELETE FROM sqlite_sequence WHERE name='#{table}'")
+  tables = ['users', 'categories', 'posts']
+  conn = ActiveRecord::Base.connection
+  tables << 'invalid_records' if conn.table_exists?('invalid_records')
+  tables.each do |table|
+    conn.execute("DELETE FROM '#{table}'")
+    conn.execute("DELETE FROM sqlite_sequence WHERE name='#{table}'")
   end
 end
