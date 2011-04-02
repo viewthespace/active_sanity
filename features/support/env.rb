@@ -4,6 +4,10 @@ require 'rubygems'
 require "bundler"
 Bundler.setup
 
+unless File.directory?("test/rails_app")
+  system("rails new test/rails_app")
+end
+
 system("rm ./test/rails_app/db/migrate/*create_invalid_records.rb")
 
 raise unless File.directory?("test/rails_app") && system("cd test/rails_app && rake db:drop db:create db:migrate")
