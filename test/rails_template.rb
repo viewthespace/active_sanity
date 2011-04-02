@@ -27,6 +27,17 @@ category_code = <<-CODE
 CODE
 inject_into_file 'app/models/category.rb', category_code, :after => "class Category < ActiveRecord::Base\n"
 
+generate :model, "email address:string type:string"
+email_code = <<-CODE
+  self.abstract_class = true
+
+  validates_presence_of :address
+CODE
+inject_into_file 'app/models/email.rb', email_code, :after => "class Email < ActiveRecord::Base\n"
+
+create_file 'app/models/personal_email.rb', "class PersonalEmail < Email; end"
+create_file 'app/models/work_email.rb', "class WorkEmail < Email; end"
+
 create_file 'app/models/not_a_model.rb', "class NotAModel; end"
 
 # Add active_sanity
@@ -34,4 +45,3 @@ append_file 'Gemfile', "gem 'active_sanity', :path => '../../'"
 
 run "bundle"
 rake "db:migrate"
-
