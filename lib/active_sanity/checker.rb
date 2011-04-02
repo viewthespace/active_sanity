@@ -8,18 +8,34 @@ module ActiveSanity
       puts "Sanity Check"
       puts "Checking the following models: #{models.join(', ')}"
 
+      # TODO: Wouldnt this list already be checked by the next all records call if those records do exist?
+      # This will validate and destroy the records that either dont exist currently, or are now valid. But the ones are continue to be invalid - these will
+      # have been run through the validation process twice
       check_previously_invalid_records
       check_all_records
     end
 
     def models
-      # Ensure ActiveRecord::Base is aware of all models under
-      # app/models
-      Dir["#{Rails.root}/app/models/**/*.rb"].each do |file_path|
-        require file_path rescue nil
+      if @models.nil?
+        # Ensure ActiveRecord::Base is aware of all models under
+        # app/models
+        # TODO: Add configurable list of other dirs to load from
+        dirs = [Rails.root.join('app', 'models', '**')]
+        dirs.each do |dir|
+          Dir.glob(File.join(dir, '*.rb')).each do |file|
+            silence_warnings do
+              begin
+                require file unless Object.const_defined?(File.basename(file).gsub(/\.rb$/, "").camelize)
+              rescue
+              end
+            end
+          end
+        end
+
+        # TODO: Do we need to exclude the InvalidRecord class from this list?
+        @models = ActiveRecord::Base.send(:descendants).select(&:descends_from_active_record?).reject(&:abstract_class?).sort_by(&:name)
       end
-      
-      @models ||= ActiveRecord::Base.subclasses 
+      @models
     end
 
     protected
@@ -57,7 +73,7 @@ module ActiveSanity
     def log_invalid_record(record)
       puts record.class.to_s + " | " + record.id.to_s + " | " + pretty_errors(record)
     end
-    
+
     def store_invalid_record(record)
       return unless InvalidRecord.table_exists?
 
