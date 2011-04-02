@@ -1,5 +1,9 @@
 module ActiveSanity
   class Checker
+    def self.dirs_to_load
+      @dirs_to_load ||= []
+    end
+
     def self.check!
       new.check!
     end
@@ -20,10 +24,9 @@ module ActiveSanity
       if @models.nil?
         # Ensure ActiveRecord::Base is aware of all models under
         # app/models
-        # TODO: Add configurable list of other dirs to load from
-        dirs = [Rails.root.join('app', 'models', '**')]
+        dirs = [File.join('app', 'models', '**')] + self.class.dirs_to_load
         dirs.each do |dir|
-          Dir.glob(File.join(dir, '*.rb')).each do |file|
+          Dir.glob(Rails.root.join(dir, '*.rb')).each do |file|
             silence_warnings do
               begin
                 require file unless Object.const_defined?(File.basename(file).gsub(/\.rb$/, "").camelize)

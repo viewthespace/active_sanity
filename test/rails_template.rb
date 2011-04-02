@@ -43,5 +43,7 @@ create_file 'app/models/not_a_model.rb', "class NotAModel; end"
 # Add active_sanity
 append_file 'Gemfile', "gem 'active_sanity', :path => '../../'"
 
+append_file 'config/environment.rb', "ActiveSanity::Checker.dirs_to_load << 'lib'"
+
 run "bundle"
 rake "db:migrate"
