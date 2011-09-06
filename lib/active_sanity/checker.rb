@@ -15,31 +15,40 @@ module ActiveSanity
       check_all_records
     end
 
+    # @return [Array] of [ActiveRecord::Base] direct descendants
     def models
-      if @models.nil?
-        # Ensure ActiveRecord::Base is aware of all models under
-        # app/models
-        # TODO: Add configurable list of other dirs to load from
-        dirs = [Rails.root.join('app', 'models', '**')]
-        dirs.each do |dir|
-          Dir.glob(File.join(dir, '*.rb')).each do |file|
-            silence_warnings do
-              begin
-                require file unless Object.const_defined?(File.basename(file).gsub(/\.rb$/, "").camelize)
-              rescue
-              end
-            end
-          end
-        end
+      return @models if @models
 
-        # TODO: Do we need to exclude the InvalidRecord class from this list?
-        @models = ActiveRecord::Base.send(:descendants).select(&:descends_from_active_record?).reject(&:abstract_class?).sort_by(&:name)
-      end
-      @models
+      load_all_models
+
+      @models ||= direct_active_record_base_descendants
     end
 
     protected
 
+    # Require all files under /app/models. 
+    # All models under /lib are required when the rails app loads.
+    def load_all_models
+      Dir["#{Rails.root}/app/models/**/*.rb"].each { |file_path| require file_path rescue nil }
+    end
+
+    # @return [Array] of direct ActiveRecord::Base descendants.
+    # Example:
+    # The following tree:
+    #   ActiveRecord::Base
+    #   |
+    #   |- User
+    #   |- Account
+    #   |  |
+    #   |  |- PersonalAccount
+    #   |  |- BusinessAccount
+    #
+    # Should return: [Account, User]
+    def direct_active_record_base_descendants
+      ActiveRecord::Base.descendants.select(&:descends_from_active_record?).sort_by(&:name)
+    end
+
+    # Remove records that are now valid from the list of invalid records.
     def check_previously_invalid_records
       return unless InvalidRecord.table_exists?
 
@@ -48,6 +57,9 @@ module ActiveSanity
       end
     end
 
+    # Go over every single record. When the record is not valid
+    # log it to STDOUT and into the invalid_records table if it exists.
+    #
     def check_all_records
       models.each do |model|
         begin
@@ -70,10 +82,14 @@ module ActiveSanity
       store_invalid_record(record)
     end
 
+    # Say that the record is invalid. Example:
+    #
+    # Account | 10 | :name => "Can't be blank"
     def log_invalid_record(record)
       puts record.class.to_s + " | " + record.id.to_s + " | " + pretty_errors(record)
     end
 
+    # Store invalid record in InvalidRecord table if it exists
     def store_invalid_record(record)
       return unless InvalidRecord.table_exists?
 
