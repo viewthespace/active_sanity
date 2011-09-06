@@ -6,7 +6,7 @@ Bundler.setup
 
 if File.directory?("test/rails_app")
   Dir.chdir("test/rails_app") do
-    raise unless system("rm -f db/migrate/*create_invalid_records.rb && rake db:drop db:create db:migrate")
+    raise unless system("rm -f db/migrate/*create_invalid_records.rb && RAILS_ENV=test rake db:drop db:create db:migrate")
   end
 end
 

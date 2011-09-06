@@ -5,7 +5,7 @@ task :default => :features
 
 desc "Run features"
 task :features do
-  raise "Failed!" unless system('bundle exec cucumber features')
+  raise "Failed!" unless system('export RAILS_ENV=test && bundle exec cucumber features')
 end
 
 desc "Clean test rails app"

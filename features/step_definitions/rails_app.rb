@@ -1,7 +1,7 @@
 def setup_rails_app
   return if File.directory?("test/rails_app")
 
-  unless system "bundle exec rails new test/rails_app -m test/rails_template.rb"
+  unless system "bundle exec rails new test/rails_app -m test/rails_template.rb && cd ./test/rails_app && RAILS_ENV=test rake db:migrate"
     system("rm -fr test/rails_app")
     raise "Failed to generate test/rails_app"
   end
@@ -15,18 +15,21 @@ Given /^I have a rails app using 'active_sanity'$/ do
   setup_rails_app
 
   require './test/rails_app/config/environment'
+
+  # Reset connection
+  ActiveRecord::Base.connection.reconnect!
 end
 
 Given /^I have a rails app using 'active_sanity' with db storage$/ do
   setup_rails_app
 
-  raise unless system("cd ./test/rails_app && rails generate active_sanity && rake db:migrate")
+  raise unless system("cd ./test/rails_app && rails generate active_sanity && RAILS_ENV=test rake db:migrate")
 
   require './test/rails_app/config/environment'
 
   # Reset connection
   ActiveRecord::Base.connection.reconnect!
-  InvalidRecord.table_exists?
+  InvalidRecord.table_exists? # Looks up if table exists.
 end
 
 Given /^the database contains a few valid records$/ do
@@ -57,7 +60,7 @@ end
 
 
 When /^I run "([^"]*)"$/ do |command|
-  puts @output = `cd ./test/rails_app && #{command}; echo "RETURN:$?"`
+  puts @output = `cd ./test/rails_app && export RAILS_ENV=test && bundle exec #{command} --trace; echo "RETURN:$?"`
   raise unless @output['RETURN:0']
 end
 
