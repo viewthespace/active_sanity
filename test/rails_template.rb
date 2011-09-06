@@ -1,5 +1,7 @@
 
 # Generate some test models
+
+# Post
 generate :model, "post title:string body:text published_at:datetime author_id:integer category_id:integer"
 post_code = <<-CODE
   belongs_to :author, :class_name => 'User'
@@ -10,15 +12,7 @@ post_code = <<-CODE
 CODE
 inject_into_file 'app/models/post.rb', post_code, :after => "class Post < ActiveRecord::Base\n"
 
-generate :model, "user first_name:string last_name:string username:string"
-user_code = <<-CODE
-  has_many :posts, :foreign_key => 'author_id'
-
-  validates_presence_of :first_name, :last_name, :username
-  validates_length_of :username, :minimum => 3
-CODE
-inject_into_file 'app/models/user.rb', user_code, :after => "class User < ActiveRecord::Base\n"
-
+# Category
 generate :model, 'category name:string description:text'
 category_code = <<-CODE
   has_many :posts
@@ -27,16 +21,23 @@ category_code = <<-CODE
 CODE
 inject_into_file 'app/models/category.rb', category_code, :after => "class Category < ActiveRecord::Base\n"
 
-generate :model, "email address:string type:string"
-email_code = <<-CODE
-  validates_presence_of :address
+# User
+generate :model, "user first_name:string last_name:string username:string type:string"
+user_code = <<-CODE
+  has_many :posts, :foreign_key => 'author_id'
+
+  validates_presence_of :first_name, :last_name, :username
+  validates_length_of :username, :minimum => 3
 CODE
-inject_into_file 'app/models/email.rb', email_code, :after => "class Email < ActiveRecord::Base\n"
+inject_into_file 'app/models/user.rb', user_code, :after => "class User < ActiveRecord::Base\n"
 
-create_file 'app/models/personal_email.rb', "class PersonalEmail < Email; end"
-create_file 'app/models/work_email.rb', "class WorkEmail < Email; end"
-create_file 'lib/lib_email.rb', "class LibEmail < Email; end"
+# Author < User
+create_file 'app/models/author.rb', "class Author < User; end"
+# Publisher < User
+create_file 'app/models/publisher.rb', "class Publisher < User; end"
 
+
+# NotAModel
 create_file 'app/models/not_a_model.rb', "class NotAModel; end"
 
 # Add active_sanity

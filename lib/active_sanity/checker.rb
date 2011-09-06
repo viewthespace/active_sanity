@@ -53,7 +53,12 @@ module ActiveSanity
       return unless InvalidRecord.table_exists?
 
       InvalidRecord.find_each do |invalid_record|
-        invalid_record.destroy if invalid_record.record.valid?
+        begin
+          invalid_record.destroy if invalid_record.record.valid?
+        rescue
+          # Record does not exists.
+          invalid_record.delete
+        end
       end
     end
 
@@ -86,22 +91,26 @@ module ActiveSanity
     #
     # Account | 10 | :name => "Can't be blank"
     def log_invalid_record(record)
-      puts record.class.to_s + " | " + record.id.to_s + " | " + pretty_errors(record)
+      puts "#{type_of(record)} | #{record.id} | #{pretty_errors(record)}"
     end
 
     # Store invalid record in InvalidRecord table if it exists
     def store_invalid_record(record)
       return unless InvalidRecord.table_exists?
 
-      invalid_record = InvalidRecord.where(:record_type => record.type, :record_id => record.id).first
+      invalid_record = InvalidRecord.where(:record_type => type_of(record), :record_id => record.id).first
       invalid_record ||= InvalidRecord.new
       invalid_record.record = record
       invalid_record.validation_errors = record.errors
       invalid_record.save!
     end
 
+    def type_of(record)
+      record.class.base_class
+    end
+
     def pretty_errors(record)
-      record.errors.inspect.sub(/^#<OrderedHash /, '').sub(/>$/, '')
+      record.errors.inspect.sub(/^#<OrderedHash (.*)>$/, '\1')
     end
   end
 end

@@ -12,7 +12,7 @@ end
 
 After do
   # Reset DB!
-  tables = ['categories', 'emails', 'invalid_records', 'posts', 'users']
+  tables = ['categories', 'invalid_records', 'posts', 'users']
   conn = ActiveRecord::Base.connection
   tables.each do |table|
     if conn.table_exists?(table)

@@ -30,21 +30,21 @@ Given /^I have a rails app using 'active_sanity' with db storage$/ do
 end
 
 Given /^the database contains a few valid records$/ do
-  User.create!(:first_name => "Greg", :last_name => "Bell", :username => "gregbell")
-  User.create!(:first_name => "Sam",  :last_name => "Vincent", :username => "samvincent")
+  Author.create!(:first_name => "Greg", :last_name => "Bell", :username => "gregbell")
+  Publisher.create!(:first_name => "Sam",  :last_name => "Vincent", :username => "samvincent")
   Category.create!(:name => "Uncategorized")
-  Post.create!(:author => User.first, :category => Category.first,
-    :title => "How ActiveAdmin changed the world", :body => "Only gods knows how...",
+  Post.create!(:author => Author.first, :category => Category.first,
+    :title => "How ActiveAdmin changed the world", :body => "Lot of love.",
     :published_at => 4.years.from_now)
 end
 
-Given /^the first user's username is empty and the first post category_id is nil$/ do
-  User.first.update_attribute(:username, "")
+Given /^the first author's username is empty and the first post category_id is nil$/ do
+  Author.first.update_attribute(:username, "")
   Post.first.update_attribute(:category_id, nil)
 end
 
-Given /^the first user's username is "([^"]*)"$/ do |username|
-  User.first.update_attribute('username', username)
+Given /^the first author's username is "([^"]*)"$/ do |username|
+  Author.first.update_attribute('username', username)
 end
 
 Given /^the first post category is set$/ do
