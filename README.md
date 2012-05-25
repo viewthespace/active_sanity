@@ -45,7 +45,7 @@ This gem is quite simple so I experiment using features only. To run the
 acceptance test suite, just run:
 
     bundle install
-    cucumber features
+    RAILS_ENV=test cucumber features
 
 Using features only was kinda handsome until I had to deal with two
 different database schema (with / without the table invalid_records) in
