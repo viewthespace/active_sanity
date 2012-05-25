@@ -26,7 +26,7 @@ module ActiveSanity
 
     protected
 
-    # Require all files under /app/models. 
+    # Require all files under /app/models.
     # All models under /lib are required when the rails app loads.
     def load_all_models
       Dir["#{Rails.root}/app/models/**/*.rb"].each { |file_path| require file_path rescue nil }
@@ -101,7 +101,7 @@ module ActiveSanity
       invalid_record = InvalidRecord.where(:record_type => type_of(record), :record_id => record.id).first
       invalid_record ||= InvalidRecord.new
       invalid_record.record = record
-      invalid_record.validation_errors = record.errors
+      invalid_record.validation_errors = record.errors.messages
       invalid_record.save!
     end
 
@@ -110,7 +110,7 @@ module ActiveSanity
     end
 
     def pretty_errors(record)
-      record.errors.inspect.sub(/^#<OrderedHash (.*)>$/, '\1')
+      record.errors.messages.inspect.sub(/^#<OrderedHash (.*)>$/, '\1')
     end
   end
 end

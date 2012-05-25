@@ -22,7 +22,7 @@ Feature: Check sanity with db storage
     And the first author's username is empty and the first post category_id is nil
     When I run "rake db:check_sanity"
     Then the table "invalid_records" should contain:
-      | User     | 1 | {:username=>["is too short (minimum is 3 characters)"]} |
+      | User     | 1 | {:username=>["can't be blank", "is too short (minimum is 3 characters)"]} |
       | Post     | 1 | {:category=>["can't be blank"]} |
 
   Scenario: Check sanity on database with invalid records now valid
@@ -30,7 +30,7 @@ Feature: Check sanity with db storage
     And the first author's username is empty and the first post category_id is nil
     When I run "rake db:check_sanity"
     Then the table "invalid_records" should contain:
-      | User     | 1 | {:username=>["is too short (minimum is 3 characters)"]} |
+      | User     | 1 | {:username=>["can't be blank", "is too short (minimum is 3 characters)"]} |
       | Post     | 1 | {:category=>["can't be blank"]} |
 
     Given the first author's username is "Greg"
@@ -44,12 +44,12 @@ Feature: Check sanity with db storage
     And the first author's username is empty and the first post category_id is nil
     When I run "rake db:check_sanity"
     Then the table "invalid_records" should contain:
-      | User     | 1 | {:username=>["is too short (minimum is 3 characters)"]} |
+      | User     | 1 | {:username=>["can't be blank", "is too short (minimum is 3 characters)"]} |
       | Post     | 1 | {:category=>["can't be blank"]} |
 
     Given the first post category is set
     And the first post title is empty
     When I run "rake db:check_sanity"
     Then the table "invalid_records" should contain:
-      | User     | 1 | {:username=>["is too short (minimum is 3 characters)"]} |
+      | User     | 1 | {:username=>["can't be blank", "is too short (minimum is 3 characters)"]} |
       | Post     | 1 | {:title=>["can't be blank"]} |

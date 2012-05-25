@@ -4,6 +4,6 @@ source "http://rubygems.org"
 gemspec
 
 group :development do
-  gem 'rails', '3.0.10'
+  gem 'rails', '~> 3.1.0'
 end
 
