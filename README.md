@@ -7,7 +7,8 @@ validation.
 
 ## Requirements
 
-* Rails >= 3.1
+ActiveSanity 0.2.0 requires Rails ~ 3.1
+ActiveSanity 0.1.1 requires Rails ~ 3.0
 
 ## Install
 
