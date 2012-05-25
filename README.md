@@ -5,6 +5,10 @@
 Perform a sanity check on your database through active record
 validation.
 
+## Requirements
+
+* Rails >= 3.1
+
 ## Install
 
 Add the following line to your Gemfile
@@ -32,14 +36,6 @@ The output might look like the following:
     User        |   1 | { "email" => ["is invalid"] }
     Flight      | 123 | { "arrival_time" => ["can't be nil"], "departure_time" => ["is invalid"] }
     Flight      | 323 | { "arrival_time" => ["can't be nil"] }
-
-## Known issues
-
-There is a bug in Rails 3.0.5 with the unserialization of OrderedHash
-storing arrays: only the last error of a given attribute gets retrieved
-from the database.
-
-See https://rails.lighthouseapp.com/projects/8994-ruby-on-rails/tickets/6646-orderedhash-serialization-does-not-work-when-storing-arrays 
 
 ## Contribute & Dev environment
 
