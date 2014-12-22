@@ -1,7 +1,7 @@
 class CreateInvalidRecords < ActiveRecord::Migration
   def self.up
     create_table :invalid_records do |t|
-      t.references :record, :polymorphic => true, :null => false
+      t.references :record, polymorphic: true, null: false
       t.text :validation_errors
       t.timestamps
     end
@@ -12,4 +12,3 @@ class CreateInvalidRecords < ActiveRecord::Migration
     drop_table :invalid_records
   end
 end
-

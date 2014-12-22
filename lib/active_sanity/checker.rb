@@ -5,7 +5,7 @@ module ActiveSanity
     end
 
     def check!
-      puts "Sanity Check"
+      puts 'Sanity Check'
       puts "Checking the following models: #{models.join(', ')}"
 
       # TODO: Wouldnt this list already be checked by the next all records call if those records do exist?
@@ -22,6 +22,7 @@ module ActiveSanity
       load_all_models
 
       @models ||= direct_active_record_base_descendants
+      @models -= [InvalidRecord]
     end
 
     protected
@@ -52,12 +53,15 @@ module ActiveSanity
     def check_previously_invalid_records
       return unless InvalidRecord.table_exists?
 
-      InvalidRecord.find_each do |invalid_record|
-        begin
-          invalid_record.destroy if invalid_record.record.valid?
-        rescue
-          # Record does not exists.
-          invalid_record.delete
+      InvalidRecord.find_in_batches do |group|
+        sleep(50) unless Rails.env.test? # Make sure GC can happen if needed
+        group.each do |invalid_record|
+          begin
+            invalid_record.destroy if invalid_record.record.valid?
+          rescue
+            # Record does not exists.
+            invalid_record.delete
+          end
         end
       end
     end
@@ -68,9 +72,11 @@ module ActiveSanity
     def check_all_records
       models.each do |model|
         begin
-          model.find_each do |record|
-            unless record.valid?
-              invalid_record!(record)
+          # TODO: Can we filter based on those records that are already present in the 'invalid_records' table - especially since they have been re-verified in the method before?
+          model.find_in_batches do |group|
+            sleep(50) unless Rails.env.test? # Make sure GC can happen if needed
+            group.each do |record|
+              invalid_record!(record) unless record.valid?
             end
           end
         rescue => e
@@ -98,7 +104,7 @@ module ActiveSanity
     def store_invalid_record(record)
       return unless InvalidRecord.table_exists?
 
-      invalid_record = InvalidRecord.where(:record_type => type_of(record), :record_id => record.id).first
+      invalid_record = InvalidRecord.where(record_type: type_of(record), record_id: record.id).first
       invalid_record ||= InvalidRecord.new
       invalid_record.record = record
       invalid_record.validation_errors = record.errors.messages

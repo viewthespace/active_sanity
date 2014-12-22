@@ -1,3 +1,9 @@
+## 0.3.0
+
+* Add Rails ~4 compatibility.
+* Uses 'find_in_batches' to not choke on a table that might have millions of records.
+* Does not rerun validations for the 'InvalidRecord' model on the second pass.
+
 ## 0.2.0
 
 * Add Rails ~3.1 compatibility. Pull Request [#6][] by [@skateinmars][].

@@ -1,0 +1,33 @@
+AllCops:
+  Include:
+    - 'Gemfile'
+    - 'Rakefile'
+    - '*.gemspec'
+    - 'lib/**/*'
+    - 'test/**/*'
+  Exclude:
+    - 'features/**/*'
+    - 'test/rails_app/**/*'
+  RunRailsCops: false
+Metrics/LineLength:
+  Enabled: false
+Style/AlignHash:
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+Style/Documentation:
+  Enabled: false
+Style/RegexpLiteral:
+  Enabled: false
+Style/CollectionMethods:
+  # Mapping from undesired method to desired_method
+  # e.g. to use `detect` over `find`:
+  #
+  # CollectionMethods:
+  #   PreferredMethods:
+  #     find: detect
+  PreferredMethods:
+    map: 'collect'
+    map!: 'collect!'
+    reduce: 'inject'
+    detect: 'find'
+    select: 'find_all'

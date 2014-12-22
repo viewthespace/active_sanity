@@ -8,4 +8,3 @@ module ActiveSanity
     end
   end
 end
-
