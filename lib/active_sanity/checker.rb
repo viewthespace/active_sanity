@@ -25,6 +25,10 @@ module ActiveSanity
       @models -= [InvalidRecord]
     end
 
+    def self.batch_size
+      500
+    end
+
     protected
 
     # Require all files under /app/models.
@@ -53,7 +57,7 @@ module ActiveSanity
     def check_previously_invalid_records
       return unless InvalidRecord.table_exists?
 
-      InvalidRecord.find_in_batches do |group|
+      InvalidRecord.find_in_batches(batch_size: Checker.batch_size) do |group|
         sleep(50) unless Rails.env.test? # Make sure GC can happen if needed
         group.each do |invalid_record|
           begin
@@ -73,7 +77,7 @@ module ActiveSanity
       models.each do |model|
         begin
           # TODO: Can we filter based on those records that are already present in the 'invalid_records' table - especially since they have been re-verified in the method before?
-          model.find_in_batches do |group|
+          model.find_in_batches(batch_size: Checker.batch_size) do |group|
             sleep(50) unless Rails.env.test? # Make sure GC can happen if needed
             group.each do |record|
               invalid_record!(record) unless record.valid?
