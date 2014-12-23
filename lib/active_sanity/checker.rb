@@ -1,5 +1,13 @@
 module ActiveSanity
   class Checker
+    class << self
+      attr_accessor :batch_size
+    end
+
+    def initialize
+      Checker.batch_size ||= 500
+    end
+
     def self.check!
       new.check!
     end
@@ -23,10 +31,6 @@ module ActiveSanity
 
       @models ||= direct_active_record_base_descendants
       @models -= [InvalidRecord]
-    end
-
-    def self.batch_size
-      500
     end
 
     protected

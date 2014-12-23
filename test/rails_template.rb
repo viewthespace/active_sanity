@@ -42,5 +42,14 @@ create_file 'app/models/not_a_model.rb', 'class NotAModel; end'
 # Add active_sanity
 append_file 'Gemfile', "gem 'active_sanity', :path => '../../'"
 
+# Configure for custom batch_size
+custom_batch_size_code = <<-CODE
+  config.after_initialize do
+    ActiveSanity::Checker.batch_size = 439
+  end
+CODE
+
+inject_into_file 'config/application.rb', custom_batch_size_code, after: " < Rails::Application\n"
+
 run 'bundle'
 rake 'db:migrate'
