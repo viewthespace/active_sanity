@@ -39,6 +39,15 @@ The output might look like the following:
     Flight      | 123 | { "arrival_time" => ["can't be nil"], "departure_time" => ["is invalid"] }
     Flight      | 323 | { "arrival_time" => ["can't be nil"] }
 
+By default, the number of records fetched from the database for validation is set to 500. If this causes any issues in your domain/codebase, you can configure it this way in 'config\application.rb' (or 'config\environments\test.rb'):
+
+    class Application < Rails::Application
+      config.after_initialize do
+        ActiveSanity::Checker.batch_size = 439
+      end
+    end
+
+
 ## Contribute & Dev environment
 
 Usual fork & pull request.
