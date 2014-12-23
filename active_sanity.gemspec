@@ -13,11 +13,12 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/versapay/active_sanity'
 
   s.add_dependency 'rails', '>=4.0'
+  s.required_ruby_version = '>= 1.9.3'
 
-  s.add_development_dependency 'rspec'
-  s.add_development_dependency 'cucumber'
-  s.add_development_dependency 'sqlite3'
-  s.add_development_dependency 'rubocop'
+  s.add_development_dependency 'rspec', '~>3.1'
+  s.add_development_dependency 'cucumber', '~>1.3'
+  s.add_development_dependency 'sqlite3', '~>1.3'
+  s.add_development_dependency 'rubocop', '~>0.28'
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
