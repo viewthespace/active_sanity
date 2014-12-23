@@ -57,31 +57,24 @@ module ActiveSanity
     def check_previously_invalid_records
       return unless InvalidRecord.table_exists?
 
-      InvalidRecord.find_in_batches(batch_size: Checker.batch_size) do |group|
-        sleep(50) unless Rails.env.test? # Make sure GC can happen if needed
-        group.each do |invalid_record|
-          begin
-            invalid_record.destroy if invalid_record.record.valid?
-          rescue
-            # Record does not exists.
-            invalid_record.delete
-          end
+      InvalidRecord.find_each(batch_size: Checker.batch_size) do |invalid_record|
+        begin
+          invalid_record.destroy if invalid_record.record.valid?
+        rescue
+          # Record does not exists.
+          invalid_record.delete
         end
       end
     end
 
     # Go over every single record. When the record is not valid
     # log it to STDOUT and into the invalid_records table if it exists.
-    #
     def check_all_records
       models.each do |model|
         begin
           # TODO: Can we filter based on those records that are already present in the 'invalid_records' table - especially since they have been re-verified in the method before?
-          model.find_in_batches(batch_size: Checker.batch_size) do |group|
-            sleep(50) unless Rails.env.test? # Make sure GC can happen if needed
-            group.each do |record|
-              invalid_record!(record) unless record.valid?
-            end
+          model.find_each(batch_size: Checker.batch_size) do |record|
+            invalid_record!(record) unless record.valid?
           end
         rescue => e
           # Rescue from exceptions (table does not exists,
