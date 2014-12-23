@@ -1,4 +1,6 @@
 *.gem
 .bundle
+.ruby-gemset
+.ruby-version
 pkg/*
 test/rails_app
