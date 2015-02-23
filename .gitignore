@@ -2,5 +2,6 @@
 .bundle
 .ruby-gemset
 .ruby-version
+Gemfile.lock
 pkg/*
 test/rails_app
