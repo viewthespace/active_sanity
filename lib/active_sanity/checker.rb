@@ -75,18 +75,19 @@ module ActiveSanity
     # log it to STDOUT and into the invalid_records table if it exists.
     def check_all_records
       models.each do |model|
-        begin
-          # TODO: Can we filter based on those records that are already present in the 'invalid_records' table - especially since they have been re-verified in the method before?
-          model.find_each(batch_size: Checker.batch_size) do |record|
-            invalid_record!(record) unless record.valid?
+        model.find_each do |record|
+          unless record_valid? record
+            invalid_record!(record)
           end
-        rescue => e
-          # Rescue from exceptions (table does not exists,
-          # deserialization error, ...)
-          puts e.message
-          puts "Skipping validations for #{model}"
         end
       end
+    end
+
+    def record_valid? record
+      record.valid?
+    rescue => e
+      puts "Validation failed for #{record}: #{e.message}"
+      false
     end
 
     def invalid_record!(record)
